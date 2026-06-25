@@ -3,19 +3,20 @@ import figlet from 'figlet';
 import ora from 'ora';
 
 export const colors = {
-    primary: chalk.cyanBright,
-    secondary: chalk.magentaBright,
-    accent: chalk.yellowBright,
-    success: chalk.greenBright,
+    primary: chalk.greenBright,
+    secondary: chalk.white,
+    accent: chalk.cyanBright,
+    success: chalk.green,
     error: chalk.redBright
 };
 
 export async function showBanner() {
     return new Promise((resolve) => {
-        figlet('LETKIRA', { font: 'Slant' }, (err, data) => {
+        console.clear();
+        figlet('LETKIRA', { font: 'Standard' }, (err, data) => {
             if (!err) {
                 console.log(colors.primary(data));
-                console.log(colors.secondary('     Termux Multi-Tool | Cyberpunk Edition\n'));
+                console.log(colors.secondary('     Ethical Hacking Framework\n'));
             }
             resolve();
         });
@@ -24,9 +25,8 @@ export async function showBanner() {
 
 export function createSpinner(text) {
     return ora({
-        text: colors.accent(text),
-        color: 'cyan',
-        spinner: 'dots'
+        text: colors.secondary(text),
+        color: 'green',
+        spinner: 'bouncingBar'
     });
 }
-
