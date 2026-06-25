@@ -14,8 +14,12 @@ export const colors = {
     error: chalk.redBright
 };
 
+export function clearScreen() {
+    process.stdout.write('\x1Bc');
+}
+
 export async function showBanner() {
-    console.clear();
+    clearScreen();
     try {
         const asciiPath = path.join(__dirname, '../ascii.txt');
         const asciiArt = await fs.readFile(asciiPath, 'utf-8');
