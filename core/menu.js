@@ -1,11 +1,11 @@
 import inquirer from 'inquirer';
-import { colors } from './ui.js';
+import { colors, showBanner } from './ui.js';
 
 export async function showMenu(plugins) {
     let running = true;
 
     while (running) {
-        console.log();
+        await showBanner();
         
         if (plugins.length === 0) {
             console.log(colors.error('No plugins loaded. Please check the plugins directory.'));
@@ -44,15 +44,13 @@ export async function showMenu(plugins) {
                 console.log(colors.error(`\n[!] Plugin Execution Error: ${err.message}\n`));
             }
 
-            const { cont } = await inquirer.prompt([
+            await inquirer.prompt([
                 {
                     type: 'input',
                     name: 'cont',
                     message: colors.accent('Press Enter to return to main menu...')
                 }
             ]);
-            console.clear();
         }
     }
 }
-
