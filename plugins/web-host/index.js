@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { colors, createSpinner } from '../../core/ui.js';
@@ -12,9 +12,27 @@ const HOSTS_DIR = path.join(__dirname, 'hosted_projects');
 let serverInstance = null;
 let tunnelProcess = null;
 
+function checkRequirements() {
+    const spinner = createSpinner('Checking system requirements...').start();
+    try {
+        execSync('command -v cloudflared', { stdio: 'ignore' });
+        spinner.succeed(colors.success('System requirements satisfied (cloudflared).'));
+    } catch {
+        spinner.text = 'Installing missing dependency: cloudflared...';
+        try {
+            execSync('pkg update -y && pkg install cloudflared -y', { stdio: 'ignore' });
+            spinner.succeed(colors.success('Successfully installed cloudflared.'));
+        } catch {
+            spinner.fail(colors.error('Failed to auto-install cloudflared. Run manually: pkg install cloudflared'));
+        }
+    }
+}
+
 export default async function run() {
     console.log(colors.primary('\n--- Web Host (Temp) Tool ---'));
     
+    checkRequirements();
+
     try {
         await fs.access(HOSTS_DIR);
     } catch {
@@ -115,9 +133,9 @@ async function startHosting(projectPath) {
         const match = data.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);
         if (match) {
             spinner.succeed(colors.success('Tunnel live broadcast established!'));
-            console.log(`\n${colors.primary('â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”')}`);
-            console.log(`${colors.primary('â”‚')} ${colors.secondary('Live URL:')} ${colors.accent(match[0].padEnd(45))} ${colors.primary('â”‚')}`);
-            console.log(`${colors.primary('â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜')}\n`);
+            console.log(`\n${colors.primary('┌────────────────────────────────────────────────────────┐')}`);
+            console.log(`${colors.primary('│')} ${colors.secondary('Live URL:')} ${colors.accent(match[0].padEnd(45))} ${colors.primary('│')}`);
+            console.log(`${colors.primary('└────────────────────────────────────────────────────────┘')}\n`);
             console.log(colors.error('Press Ctrl+C inside this screen context or exit to stop hosting.\n'));
         }
     });
