@@ -1,6 +1,0 @@
-{
-  "name": "System Resources",
-  "description": "Displays current Termux memory and CPU metrics.",
-  "version": "1.0.0",
-  "author": "Vaishnav"
-}
