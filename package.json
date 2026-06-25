@@ -1,7 +1,7 @@
 {
   "name": "letkira",
   "version": "1.0.0",
-  "description": "A professional, modular, open-source Termux multi-tool.",
+  "description": "A modular, open-source Termux ethical hacking framework.",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -14,7 +14,6 @@
     "inquirer": "^9.2.12",
     "ora": "^7.0.1"
   },
-  "author": "Vaishnav",
+  "author": "",
   "license": "MIT"
 }
-
