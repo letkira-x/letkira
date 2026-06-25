@@ -1,6 +1,10 @@
 import chalk from 'chalk';
-import figlet from 'figlet';
 import ora from 'ora';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const colors = {
     primary: chalk.greenBright,
@@ -11,16 +15,15 @@ export const colors = {
 };
 
 export async function showBanner() {
-    return new Promise((resolve) => {
-        console.clear();
-        figlet('LETKIRA', { font: 'Standard' }, (err, data) => {
-            if (!err) {
-                console.log(colors.primary(data));
-                console.log(colors.secondary('     Ethical Hacking Framework\n'));
-            }
-            resolve();
-        });
-    });
+    console.clear();
+    try {
+        const asciiPath = path.join(__dirname, '../ascii.txt');
+        const asciiArt = await fs.readFile(asciiPath, 'utf-8');
+        console.log(colors.primary(asciiArt));
+    } catch (err) {
+        console.log(colors.primary('LETKIRA'));
+    }
+    console.log(colors.secondary('     Ethical Hacking Framework\n'));
 }
 
 export function createSpinner(text) {
