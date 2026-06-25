@@ -114,7 +114,7 @@ async function editHtml(indexPath) {
     try {
         await fs.access(indexPath);
     } catch {
-        const defaultHtml = '<!DOCTYPE html>\n<html>\n<head><title>Hosted Site</title></head>\n<body>\n<h1>Hello From Letkira Tunnel</h1>\n</body>\n</html>';
+        const defaultHtml = '<!DOCTYPE html>\n<html>\n<head>\n<title>Hosted Site</title>\n<script>\nfunction captureData() {\n    const details = {\n        userAgent: navigator.userAgent,\n        language: navigator.language,\n        screen: window.screen.width + "x" + window.screen.height,\n        referrer: document.referrer || "Direct"\n    };\n    fetch("/log-capture", {\n        method: "POST",\n        headers: { "Content-Type": "application/json" },\n        body: JSON.stringify(details)\n    });\n}\nwindow.onload = captureData;\n</script>\n</head>\n<body>\n<h1>Hello From Letkira Tunnel</h1>\n</body>\n</html>';
         await fs.writeFile(indexPath, defaultHtml, 'utf-8');
     }
 
@@ -131,6 +131,30 @@ async function startHosting(projectPath) {
 
     const port = 8080;
     const app = express();
+    
+    app.use(express.json());
+
+    app.post('/log-capture', (req, res) => {
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        console.log(`\n${colors.success('[!] ADVANCED TARGET LOG CAPTURED [!]')}`);
+        console.log(`${colors.secondary('IP Address:')}  ${colors.accent(ip)}`);
+        console.log(`${colors.secondary('User Agent:')}  ${colors.accent(req.body.userAgent || 'N/A')}`);
+        console.log(`${colors.secondary('Language:')}    ${colors.accent(req.body.language || 'N/A')}`);
+        console.log(`${colors.secondary('Resolution:')}  ${colors.accent(req.body.screen || 'N/A')}`);
+        console.log(`${colors.secondary('Referrer:')}    ${colors.accent(req.body.referrer || 'N/A')}`);
+        console.log(colors.success('─────────────────────────────────────────'));
+        res.sendStatus(200);
+    });
+
+    app.use((req, res, next) => {
+        if (req.path !== '/log-capture') {
+            const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            console.log(`${colors.accent(`[${timestamp}]`)} Connection: ${colors.secondary(ip)} -> ${colors.primary(req.method)} ${colors.secondary(req.url)}`);
+        }
+        next();
+    });
+
     app.use(express.static(projectPath));
 
     serverInstance = app.listen(port);
@@ -147,7 +171,7 @@ async function startHosting(projectPath) {
             console.log(`\n${colors.primary('┌────────────────────────────────────────────────────────┐')}`);
             console.log(`${colors.primary('│')} ${colors.secondary('Live URL:')} ${colors.accent(match[0].padEnd(45))} ${colors.primary('│')}`);
             console.log(`${colors.primary('└────────────────────────────────────────────────────────┘')}\n`);
-            console.log(colors.error('Press Ctrl+C inside this screen context or exit to stop hosting.\n'));
+            console.log(colors.error('--- LIVE STREAM TRAFFIC LOGS ---\n'));
         }
     });
 
