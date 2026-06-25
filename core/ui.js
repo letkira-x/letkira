@@ -27,7 +27,7 @@ export async function showBanner() {
     } catch (err) {
         console.log(colors.primary('LETKIRA'));
     }
-    console.log(colors.secondary('     Ethical Hacking Framework\n'));
+    console.log(colors.secondary('     LETKIRA.ONIOM\n'));
 }
 
 export function createSpinner(text) {
