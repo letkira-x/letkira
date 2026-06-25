@@ -1,0 +1,20 @@
+{
+  "name": "letkira",
+  "version": "1.0.0",
+  "description": "A professional, modular, open-source Termux multi-tool.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "chalk": "^5.3.0",
+    "figlet": "^1.7.0",
+    "inquirer": "^9.2.12",
+    "ora": "^7.0.1"
+  },
+  "author": "Vaishnav",
+  "license": "MIT"
+}
+
