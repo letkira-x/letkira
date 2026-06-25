@@ -18,12 +18,12 @@ function checkRequirements() {
         execSync('command -v cloudflared', { stdio: 'ignore' });
         spinner.succeed(colors.success('System requirements satisfied (cloudflared).'));
     } catch {
-        spinner.text = 'Installing missing dependency: cloudflared...';
+        spinner.info(colors.accent('Installing missing dependency: cloudflared...\n'));
         try {
-            execSync('pkg update -y && pkg install cloudflared -y', { stdio: 'ignore' });
-            spinner.succeed(colors.success('Successfully installed cloudflared.'));
-        } catch {
-            spinner.fail(colors.error('Failed to auto-install cloudflared. Run manually: pkg install cloudflared'));
+            execSync('pkg update -y && pkg install cloudflared -y', { stdio: 'inherit' });
+            console.log(colors.success('\n[+] Successfully installed cloudflared.'));
+        } catch (err) {
+            console.log(colors.error('\n[!] Failed to auto-install cloudflared. Run manually: pkg install cloudflared'));
         }
     }
 }
