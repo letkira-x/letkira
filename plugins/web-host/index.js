@@ -17,13 +17,17 @@ function checkRequirements() {
     try {
         execSync('command -v cloudflared', { stdio: 'ignore' });
         spinner.succeed(colors.success('System requirements satisfied (cloudflared).'));
+        return true;
     } catch {
         spinner.info(colors.accent('Installing missing dependency: cloudflared...\n'));
         try {
             execSync('pkg update -y && pkg install cloudflared -y', { stdio: 'inherit' });
             console.log(colors.success('\n[+] Successfully installed cloudflared.'));
+            return true;
         } catch (err) {
-            console.log(colors.error('\n[!] Failed to auto-install cloudflared. Run manually: pkg install cloudflared'));
+            console.log(colors.error('\n[!] Failed to auto-install cloudflared.'));
+            console.log(colors.accent('Please install manually by typing: pkg install cloudflared'));
+            return false;
         }
     }
 }
@@ -31,7 +35,11 @@ function checkRequirements() {
 export default async function run() {
     console.log(colors.primary('\n--- Web Host (Temp) Tool ---'));
     
-    checkRequirements();
+    const isReady = checkRequirements();
+    if (!isReady) {
+        console.log(colors.error('Cannot proceed without required dependencies. Exiting tool...'));
+        return;
+    }
 
     try {
         await fs.access(HOSTS_DIR);
@@ -102,17 +110,20 @@ async function manageProject(projectName, projectPath) {
 
 async function editHtml(indexPath) {
     console.log(colors.primary('\n--- HTML Editor ---'));
-    const { htmlContent } = await inquirer.prompt([
-        {
-            type: 'editor',
-            name: 'htmlContent',
-            message: colors.accent('Write or paste your index.html source code:'),
-            default: '<!DOCTYPE html>\n<html>\n<head><title>Hosted Site</title></head>\n<body>\n<h1>Hello From Letkira Tunnel</h1>\n</body>\n</html>'
-        }
-    ]);
+    
+    try {
+        await fs.access(indexPath);
+    } catch {
+        const defaultHtml = '<!DOCTYPE html>\n<html>\n<head><title>Hosted Site</title></head>\n<body>\n<h1>Hello From Letkira Tunnel</h1>\n</body>\n</html>';
+        await fs.writeFile(indexPath, defaultHtml, 'utf-8');
+    }
 
-    await fs.writeFile(indexPath, htmlContent, 'utf-8');
-    console.log(colors.success('[+] index.html saved successfully.'));
+    try {
+        execSync(`nano "${indexPath}"`, { stdio: 'inherit' });
+        console.log(colors.success('\n[+] index.html saved successfully.'));
+    } catch (err) {
+        console.log(colors.error('\n[!] Failed to open nano. Please install manually: pkg install nano'));
+    }
 }
 
 async function startHosting(projectPath) {
