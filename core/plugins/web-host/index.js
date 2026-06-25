@@ -4,7 +4,7 @@ import path from 'path';
 import { exec } from 'child_process';
 import express from 'express';
 import { fileURLToPath } from 'url';
-import { colors, createSpinner, clearScreen } from '../../core/ui.js';
+import { colors, createSpinner } from '../../core/ui.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const HOSTS_DIR = path.join(__dirname, 'hosted_projects');
@@ -143,5 +143,4 @@ function stopServer() {
         serverInstance = null;
     }
     console.log(colors.error('[*] Core hosting streams terminated.'));
-          }
-
+}
