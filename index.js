@@ -4,10 +4,10 @@ import { showMenu } from './core/menu.js';
 import { checkUpdates } from './core/updater.js';
 
 async function init() {
-    console.clear();
     await showBanner();
     await checkUpdates();
     const plugins = await loadPlugins();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await showMenu(plugins);
 }
 
