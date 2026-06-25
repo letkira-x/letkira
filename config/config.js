@@ -1,7 +1,6 @@
 export const config = {
-    repository: "letkira-x/letkira",
-    theme: "cyberpunk",
+    repository: "letkira",
+    theme: "terminal",
     timeout: 5000,
     checkUpdatesOnStart: true
 };
-
