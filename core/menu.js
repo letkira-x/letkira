@@ -5,13 +5,13 @@ function formatRow(id, name, desc) {
     const c1 = id.padEnd(4).substring(0, 4);
     const c2 = name.padEnd(20).substring(0, 20);
     const c3 = desc.padEnd(30).substring(0, 30);
-    return `${colors.primary('│')} ${colors.accent(c1)} ${colors.primary(c2)} ${colors.secondary(c3)} ${colors.primary('│')}`;
+    return `│ ${c1} ${c2} ${c3} │`;
 }
 
 function formatExitRow() {
     const c1 = '[0]'.padEnd(4);
     const rest = 'Exit System'.padEnd(51).substring(0, 51);
-    return `${colors.primary('│')} ${colors.error(c1)} ${colors.secondary(rest)} ${colors.primary('│')}`;
+    return `│ ${c1} ${rest} │`;
 }
 
 export async function showMenu(plugins) {
