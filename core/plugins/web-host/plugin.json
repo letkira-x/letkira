@@ -1,0 +1,7 @@
+{
+  "name": "Web Host (Temp)",
+  "description": "Host an index.html site via Cloudflare Tunnel.",
+  "version": "1.0.0",
+  "author": ""
+}
+
