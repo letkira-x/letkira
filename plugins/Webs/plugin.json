@@ -1,6 +1,6 @@
 {
   "name": "Website Scanner",
-  "description": "Inspect a public website's server info, security headers, cookies, DNS records, and common public files.",
+  "description": "Web Scanner",
   "version": "1.0.0",
-  "author": ""
+  "author": "Kira"
 }
