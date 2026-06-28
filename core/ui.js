@@ -27,7 +27,7 @@ export async function showBanner() {
     } catch (err) {
         console.log(colors.primary('LETKIRA'));
     }
-    console.log(colors.secondary('     LETKIRA.ONIOM\n'));
+    console.log(colors.secondary('     LETKIRA.ONION\n'));
 }
 
 export function createSpinner(text) {
